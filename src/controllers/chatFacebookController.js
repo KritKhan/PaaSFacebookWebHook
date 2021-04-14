@@ -73,7 +73,7 @@ async function handleMessage(received_data) {
         projectId: process.env.GCP_PROJECT_ID
     });
 
-    await pubSubClient.topic(process.envGCP_PUBSUB_TOPIC).publish(dataBuffer);
+    await pubSubClient.topic(process.env.GCP_PUBSUB_TOPIC).publish(dataBuffer);
 };
 
 module.exports = {
