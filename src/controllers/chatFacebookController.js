@@ -25,7 +25,7 @@ let postWebHook = (req, res) => {
                 console.log("==========================")
                 console.log("This is my test log: \n")
                 if (webhook_event.message.attachments) {
-                    console.log(webhook_event.message.attachments.payload);
+                    console.log(webhook_event.message.attachments[0].payload);
                 } else {
                     console.log(webhook_event.message)
                 }
