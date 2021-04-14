@@ -5,12 +5,16 @@ const pubsub = require("@google-cloud/pubsub");
 let postWebHook = (req, res) => {
     let body = req.body;
     
+    console.log("===============");
+    console.log(body);
+    console.log("===============");
+
     // Checks this is an event from a page subscription
     if (body.object === 'page') {
     
         // Iterates over each entry - there may be multiple if batched
         body.entry.forEach(function(entry) {
-    
+            
             // Gets the body of the webhook event
             let webhook_event = entry.messaging[0];
             console.log(webhook_event);
@@ -21,7 +25,8 @@ let postWebHook = (req, res) => {
 
             // Check if the event is a message or postback and
             // pass the event to the appropriate handler function
-            handleMessage(webhook_event)
+            let data = {"entry": webhook_event};
+            handleMessage(data);
         });
     
         // Returns a '200 OK' response to all requests
@@ -55,21 +60,6 @@ let getWebHook = (req, res) => {
             // Responds with '403 Forbidden' if verify tokens do not match
             res.sendStatus(403);      
         }
-    }
-};
-
-const publishMessage = async (topicName, data) => {
-
-    try {
-        console.log('Publishing message with data: ', data);
-        const messageId = await pubSubClient.topic(topicName).publish(dataBuffer);
-        console.log(`Message ${messageId} published.`);
-        // return;
-    }
-    catch (error) {
-        console.error(`Received error while publishing message with data: ${data} to topic: ${topicName}.`);
-        console.error(error);
-        // throw new ApiError_1.ApiError(510, 'Error while publishing message.');
     }
 };
 
