@@ -1,5 +1,6 @@
 require('dotenv').config()
 const request = require("request");
+const pubsub = require("@google-cloud/pubsub");
 
 let postWebHook = (req, res) => {
     let body = req.body;
@@ -14,26 +15,13 @@ let postWebHook = (req, res) => {
             let webhook_event = entry.messaging[0];
             console.log(webhook_event);
 
-
             // Get the sender PSID
             let sender_psid = webhook_event.sender.id;
             console.log('Sender PSID: ' + sender_psid);
 
             // Check if the event is a message or postback and
             // pass the event to the appropriate handler function
-            if (webhook_event.message) {
-                console.log("==========================")
-                console.log("This is my test log: \n")
-                if (webhook_event.message.attachments) {
-                    console.log(webhook_event.message.attachments[0].payload);
-                } else {
-                    console.log(webhook_event.message)
-                }
-                console.log("==========================")
-                handleMessage(sender_psid, webhook_event.message);        
-            } else if (webhook_event.postback) {
-                handlePostback(sender_psid, webhook_event.postback);
-            }
+            handleMessage(webhook_event)
         });
     
         // Returns a '200 OK' response to all requests
@@ -70,93 +58,32 @@ let getWebHook = (req, res) => {
     }
 };
 
+const pubSubClient = new pubsub.PubSub({
+    keyFilename: 'serviceAccountKey.json',
+    projectId: process.env.GCP_PROJECT_ID
+});
+
+const publishMessage = async (topicName, data) => {
+
+    const dataBuffer = Buffer.from(data);
+    try {
+        console.log('Publishing message with data: ', data);
+        const messageId = await pubSubClient.topic(topicName).publish(dataBuffer);
+        console.log(`Message ${messageId} published.`);
+        // return;
+    }
+    catch (error) {
+        console.error(`Received error while publishing message with data: ${data} to topic: ${topicName}.`);
+        console.error(error);
+        // throw new ApiError_1.ApiError(510, 'Error while publishing message.');
+    }
+};
+
 // Handles messages events
-function handleMessage(sender_psid, received_message) {
-    let response;
-  
-    // Checks if the message contains text
-    if (received_message.text) {    
-        // Create the payload for a basic text message, which
-        // will be added to the body of our request to the Send API
-        response = {
-            "text": `You sent the message: "${received_message.text}". Now send me an attachment!`
-        }
-    } else if (received_message.attachments) {
-        // Get the URL of the message attachment
-        let attachment_url = received_message.attachments[0].payload.url;
-        response = {
-            "attachment": {
-                "type": "template",
-                "payload": {
-                    "template_type": "generic",
-                    "elements": [
-                        {
-                            "title": "Is this the right picture?",
-                            "subtitle": "Tap a button to answer.",
-                            "image_url": attachment_url,
-                            "buttons": [
-                        {
-                            "type": "postback",
-                            "title": "Yes!",
-                            "payload": "yes",
-                        },
-                        {
-                            "type": "postback",
-                            "title": "No!",
-                            "payload": "no",
-                        }
-                        ],
-                    }]
-                }
-            }
-        }
-    } 
-    
-    // Send the response message
-    callSendAPI(sender_psid, response); 
-}
-
-// Handles messaging_postbacks events
-function handlePostback(sender_psid, received_postback) {
-    let response;
-  
-    // Get the payload for the postback
-    let payload = received_postback.payload;
-
-    // Set the response based on the postback payload
-    if (payload === 'yes') {
-        response = { "text": "Thanks!" }
-    } else if (payload === 'no') {
-        response = { "text": "Oops, try sending another image." }
-    }
-    // Send the message to acknowledge the postback
-    callSendAPI(sender_psid, response);
-}
-
-// Sends response messages via the Send API
-function callSendAPI(sender_psid, response) {
-    // Construct the message body
-    let request_body = {
-        "recipient": {
-            "id": sender_psid
-        },
-        "message": response
-    }
-
-    // Send the HTTP request to the Messenger Platform
-    request({
-        "uri": "https://graph.facebook.com/v2.6/me/messages",
-        "qs": { "access_token": process.env.FACEBOOK_WEB_ACCESS_TOKEN },
-        "method": "POST",
-        "json": request_body
-    }, (err, res, body) => {
-        if (!err) {
-            console.log('message sent!')
-        } else {
-            console.error("Unable to send message:" + err);
-        }
-    }); 
-}
+async function handleMessage(received_data) {
+    // let response;
+    await publishMessage(process.env.GCP_PUBSUB_TOPIC || '', received_data);
+};
 
 module.exports = {
     postWebHook: postWebHook,
