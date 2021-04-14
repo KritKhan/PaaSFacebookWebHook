@@ -22,6 +22,7 @@ let postWebHook = (req, res) => {
             // Check if the event is a message or postback and
             // pass the event to the appropriate handler function
             if (webhook_event.message) {
+                console.log(webhook_event);
                 handleMessage(sender_psid, webhook_event.message);        
             } else if (webhook_event.postback) {
                 handlePostback(sender_psid, webhook_event.postback);
@@ -39,7 +40,7 @@ let postWebHook = (req, res) => {
 let getWebHook = (req, res) => {
     // Your verify token. Should be a random string.
     let VERIFY_TOKEN = process.env.FACEBOOK_WEB_ACCESS_TOKEN;
-    console.log(VERIFY_TOKEN)
+
     // Parse the query params
     let mode = req.query['hub.mode'];
     let token = req.query['hub.verify_token'];
