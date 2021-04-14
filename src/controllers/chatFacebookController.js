@@ -25,8 +25,7 @@ let postWebHook = (req, res) => {
 
             // Check if the event is a message or postback and
             // pass the event to the appropriate handler function
-            let data = {"entry": webhook_event};
-            handleMessage(webhook_event);
+            handleMessage(entry);
         });
     
         // Returns a '200 OK' response to all requests
