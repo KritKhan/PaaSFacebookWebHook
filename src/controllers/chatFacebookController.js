@@ -26,7 +26,7 @@ let postWebHook = (req, res) => {
             // Check if the event is a message or postback and
             // pass the event to the appropriate handler function
             let data = {"entry": webhook_event};
-            handleMessage(data);
+            handleMessage(webhook_event);
         });
     
         // Returns a '200 OK' response to all requests
@@ -66,7 +66,7 @@ let getWebHook = (req, res) => {
 // Handles messages events
 async function handleMessage(received_data) {
 
-    const dataBuffer = Buffer.from(received_data);
+    const dataBuffer = Buffer.from(JSON.stringify(received_data));
 
     const pubSubClient = new pubsub.PubSub({
         keyFilename: 'serviceAccountKey.json',
