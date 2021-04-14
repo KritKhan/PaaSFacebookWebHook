@@ -58,14 +58,8 @@ let getWebHook = (req, res) => {
     }
 };
 
-const pubSubClient = new pubsub.PubSub({
-    keyFilename: 'serviceAccountKey.json',
-    projectId: process.env.GCP_PROJECT_ID
-});
-
 const publishMessage = async (topicName, data) => {
 
-    const dataBuffer = Buffer.from(data);
     try {
         console.log('Publishing message with data: ', data);
         const messageId = await pubSubClient.topic(topicName).publish(dataBuffer);
@@ -81,8 +75,15 @@ const publishMessage = async (topicName, data) => {
 
 // Handles messages events
 async function handleMessage(received_data) {
-    // let response;
-    await publishMessage(process.env.GCP_PUBSUB_TOPIC || '', received_data);
+
+    const dataBuffer = Buffer.from(data);
+
+    const pubSubClient = new pubsub.PubSub({
+        keyFilename: 'serviceAccountKey.json',
+        projectId: process.env.GCP_PROJECT_ID
+    });
+
+    await pubSubClient.topic(process.envGCP_PUBSUB_TOPIC).publish(dataBuffer);
 };
 
 module.exports = {
