@@ -76,7 +76,7 @@ const publishMessage = async (topicName, data) => {
 // Handles messages events
 async function handleMessage(received_data) {
 
-    const dataBuffer = Buffer.from(data);
+    const dataBuffer = Buffer.from(received_data);
 
     const pubSubClient = new pubsub.PubSub({
         keyFilename: 'serviceAccountKey.json',
