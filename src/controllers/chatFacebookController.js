@@ -28,7 +28,7 @@ let postWebHook = (req, res) => {
 
 let getWebHook = (req, res) => {
     // Your verify token. Should be a random string.
-    let VERIFY_TOKEN = process.env.FACEBOOK_WEB_ACCESS_TOKEN;
+    let VERIFY_TOKEN = "EAAEF3KdoDCwBACpT6zWzsiycxLaFJhIlw0b2XEH0iZAY6Y11MT9j3BL7tZB5zOsC2sSnnCEQDeEABy8jNpmLywSXRnQylAiJLZB6fDKgJxtuW0DWPoaIbe1W4A7MiRgwzq1oYWnX9ZCDo4YzFTMV0Q8gkLr2ZBAoZCfNfBlhzhmwZDZD";
     console.log(VERIFY_TOKEN)
     // Parse the query params
     let mode = req.query['hub.mode'];
