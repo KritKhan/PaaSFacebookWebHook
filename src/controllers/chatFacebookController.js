@@ -69,7 +69,7 @@ async function handleMessage(received_data) {
     const dataBuffer = Buffer.from(JSON.stringify(received_data));
 
     const pubSubClient = new pubsub.PubSub({
-        keyFilename: 'serviceAccountKey.json',
+        keyFilename: '../serviceAccountKey.json',
         projectId: process.env.GCP_PROJECT_ID
     });
 
