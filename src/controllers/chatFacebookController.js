@@ -9,10 +9,13 @@ let postWebHook = (req, res) => {
         // Iterates over each entry - there may be multiple if batched
         body.entry.forEach(function(entry) {
     
-            // Gets the message. entry.messaging is an array, but 
-            // will only ever contain one message, so we get index 0
+            // Gets the body of the webhook event
             let webhook_event = entry.messaging[0];
             console.log(webhook_event);
+
+            // Get the sender PSID
+            let sender_psid = webhook_event.sender.id;
+            console.log('Sender PSID: ' + sender_psid);
         });
     
         // Returns a '200 OK' response to all requests
@@ -25,7 +28,7 @@ let postWebHook = (req, res) => {
 
 let getWebHook = (req, res) => {
     // Your verify token. Should be a random string.
-    let VERIFY_TOKEN = "EAAEF3KdoDCwBACpT6zWzsiycxLaFJhIlw0b2XEH0iZAY6Y11MT9j3BL7tZB5zOsC2sSnnCEQDeEABy8jNpmLywSXRnQylAiJLZB6fDKgJxtuW0DWPoaIbe1W4A7MiRgwzq1oYWnX9ZCDo4YzFTMV0Q8gkLr2ZBAoZCfNfBlhzhmwZDZD";
+    let VERIFY_TOKEN = process.env.FACEBOOK_WEB_ACCESS_TOKEN;
     console.log(VERIFY_TOKEN)
     // Parse the query params
     let mode = req.query['hub.mode'];
@@ -48,6 +51,21 @@ let getWebHook = (req, res) => {
         }
     }
 };
+
+// Handles messages events
+function handleMessage(sender_psid, received_message) {
+
+}
+
+// Handles messaging_postbacks events
+function handlePostback(sender_psid, received_postback) {
+
+}
+
+// Sends response messages via the Send API
+function callSendAPI(sender_psid, response) {
+  
+}
 
 module.exports = {
     postWebHook: postWebHook,
