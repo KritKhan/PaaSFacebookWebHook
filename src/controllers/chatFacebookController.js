@@ -4,28 +4,20 @@ const pubsub = require("@google-cloud/pubsub");
 
 let postWebHook = (req, res) => {
     let body = req.body;
-    
-    console.log("===============");
-    console.log(body);
-    console.log("===============");
 
     // Checks this is an event from a page subscription
     if (body.object === 'page') {
-    
+        
         // Iterates over each entry - there may be multiple if batched
         body.entry.forEach(function(entry) {
             
-            // Gets the body of the webhook event
-            let webhook_event = entry.messaging[0];
-            console.log(webhook_event);
-
-            // Get the sender PSID
-            let sender_psid = webhook_event.sender.id;
-            console.log('Sender PSID: ' + sender_psid);
-
+            console.log("entry:", entry);
             // Check if the event is a message or postback and
             // pass the event to the appropriate handler function
-            handleMessage(entry);
+            entry.messaging.forEach(function(message){
+                console.log("message:", message);
+                handleMessage(message);
+            });
         });
     
         // Returns a '200 OK' response to all requests
