@@ -24,7 +24,11 @@ let postWebHook = (req, res) => {
             if (webhook_event.message) {
                 console.log("==========================")
                 console.log("This is my test log: \n")
-                console.log(webhook_event.message.attachment.payload);
+                if (webhook_event.message.attachment) {
+                    console.log(webhook_event.message.attachment.payload);
+                } else {
+                    console.log(webhook_event.message)
+                }
                 console.log("==========================")
                 handleMessage(sender_psid, webhook_event.message);        
             } else if (webhook_event.postback) {
